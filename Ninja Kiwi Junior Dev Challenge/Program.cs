@@ -1,13 +1,12 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using challenge;
 using System.Drawing;
-using static System.Net.Mime.MediaTypeNames;
 
 Console.WriteLine("Hello, World!");
 
 //Testing object
 Islands test = new Islands("../../../Images/islands.png");
-Console.WriteLine(test.image.);
+Console.WriteLine(test.CountBlack());
 
 Console.WriteLine("1");
 
@@ -40,23 +39,24 @@ namespace challenge
         public int CountBlack()
         {
             int x, y;
+            int count = 0;
 
             // Loop through the images pixels to reset color.
             for (x = 0; x < image.Width; x++)
             {
                 for (y = 0; y < image.Height; y++)
                 {
-                    if(image.GetPixel(x, y) == Color.Black);
+                    Color color = image.GetPixel(x, y);
+                    if (image.GetPixel(x, y).Name == "ff000000")
+                    {
+                        count++;
+                    }       
                 }
             }
 
-            return CountBlack();
+            return count;
         }
-
-
-    }
-
-   
+    }  
 }
 
 
