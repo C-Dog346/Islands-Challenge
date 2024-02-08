@@ -1,15 +1,15 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using System.Drawing;
-
-
 public class Challenge
 {
     public Bitmap image;
     private readonly string black = "ff000000";
+    private double maxBound;
 
     public Challenge(string file)
     {
         image = ConvertToBitmap(file);
+        maxBound = image.Width * image.Height;
     }
 
     private Bitmap ConvertToBitmap(string file)
@@ -50,12 +50,15 @@ public class Challenge
     {
         List<List<Point>> islands = new List<List<Point>>();
 
+        // 2D Array used for storing visited pixel coordinates
         bool[,] visited = new bool[image.Width, image.Height];
 
+        // Builds a list of islands 
         for (int x = 0; x < image.Width; x++)
         {
             for (int y = 0; y < image.Height; y++)
             {
+                // Pixel that is black and not ivisted yet
                 if (image.GetPixel(x, y).Name == black && !visited[x, y])
                 {
                     List<Point> island = new List<Point>();
@@ -70,15 +73,18 @@ public class Challenge
 
     private void DepthFirstSearch(Bitmap image, int x, int y, bool[,] visited, List<Point> island)
     {
+        // If out of bounds
         if (x < 0 || y < 0 || x >= image.Width || y >= image.Height)
             return;
 
+        // If already visited or white
         if (image.GetPixel(x, y).Name != black || visited[x, y])
             return;
 
         visited[x, y] = true;
         island.Add(new Point(x, y));
 
+        // Check right, left, up and down for more valid pixels
         DepthFirstSearch(image, x + 1, y, visited, island);
         DepthFirstSearch(image, x - 1, y, visited, island);
         DepthFirstSearch(image, x, y + 1, visited, island);
@@ -96,19 +102,27 @@ public class Challenge
             sumY += point.Y;
         }
 
+        // Average the all the pixel coordinates to find the average coordinate AKA the center
         double centerX = sumX / points.Count;
         double centerY = sumY / points.Count;
 
+        // Math.Round for more accurate rounding to integers (will round up when appropriate instead of always down)
         return new Point((int)Math.Round(centerX), (int)Math.Round(centerY));
     }
 
     public List<Point> FindMostCentralIsland(List<List<Point>> islands)
     {
-        double minAvgDistance = image.Width + image.Height;
+        double minAvgDistance = maxBound;
         List<Point> mostCentralIsland = null;
 
+        // Edge case handling
+        if (islands.Count == 1)
+            return islands[0];
+
+        // Go through every island and calculate distance to other islands
         for (int i = 0; i < islands.Count; i++)
         {
+            // Total distance to all islands for a given island
             double totalDistance = 0;
             for (int j = 0; j < islands.Count; j++)
             {
@@ -119,6 +133,7 @@ public class Challenge
                 }
             }
 
+            // Total distance averaged 
             double avgDistance = totalDistance / (islands.Count - 1);
             if (avgDistance < minAvgDistance)
             {
@@ -132,7 +147,7 @@ public class Challenge
 
     private double CalculateDistance(List<Point> island1, List<Point> island2)
     {
-        double minDistance = double.MaxValue;
+        double minDistance = maxBound;
 
         foreach (Point p1 in island1)
         {
@@ -147,25 +162,61 @@ public class Challenge
         return minDistance;
     }
 
+    public void MarkIslands(List<List<Point>> islands, Point centralIsland)
+    {
+        for (int i = 0; i < islands.Count; i++)
+        {
+            Point center = FindCenter(islands[i]);
+            if (center.X == centralIsland.X && center.Y == centralIsland.Y)
+                image.SetPixel(center.X, center.Y, Color.Red);
+            else
+                image.SetPixel(center.X, center.Y, Color.Yellow);
+        }
+    }
+
+    public void SaveImage(string fileName)
+    {
+        image.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+    }
+
     static void Main(string[] args)
     {
-        Console.WriteLine("Hello, World!");
-
-        //Testing object
-        Challenge test = new Challenge("../../../Images/islands.png");
+        // Testing object
+        Challenge test = new Challenge("../../../Images/drawisland(6).png");
         //Console.WriteLine(test.CountBlack());
 
         List<List<Point>> islands = test.FindIslandCenters();
-
+        
         Console.WriteLine("Number of islands: " + islands.Count);
-       
+
+        // All island centers
         for (int i = 0; i < islands.Count; i++)
         {
             Point center = test.FindCenter(islands[i]);
-            Console.WriteLine($"Centremost point of Island {i + 1}: ({center.X}, {center.Y})");
+            Console.WriteLine($"Centermost point of Island {i + 1}: ({center.X}, {center.Y})");
         }
 
+        // Find Center island's center point
+        Point centralIsland = test.FindCenter(test.FindMostCentralIsland(islands));
+        Console.WriteLine($"Centermost Island: ({centralIsland.X}, {centralIsland.Y})");
+        
+        // Print smaller towers, skipping over the main tower
+        for (int i = 0; i < islands.Count; i++)
+        {
+            Point center = test.FindCenter(islands[i]);
+            if (!(center.X == centralIsland.X && center.Y == centralIsland.Y))
+                Console.WriteLine($"Smaller Communication towers point of Island {i + 1}: ({center.X}, {center.Y})");
+        }
 
+        Console.WriteLine($"Main Communication Tower: ({centralIsland.X}, {centralIsland.Y})");
+
+        // Save image with marked towers
+        test.MarkIslands(test.FindIslandCenters(), centralIsland);
+        test.SaveImage("../../../Images/Marked Islands.png");
+
+        Console.WriteLine("Saving Image with Communication Towers marked as \"Marked Islands\"");
+        Console.WriteLine("Small Communication Towers marked in YELLOW");
+        Console.WriteLine("Main Communication Tower marked in RED");
 
         Console.WriteLine("End");
     }
