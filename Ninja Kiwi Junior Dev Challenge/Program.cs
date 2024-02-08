@@ -61,11 +61,11 @@ public class Challenge
                 // Pixel that is black and not ivisted yet
                 if (image.GetPixel(x, y).Name == black && !visited[x, y])
                 {
-                    // DFS Solution
+                    // DFS Solution (Stack overflow error limited - pretty big issue for larger images)
                     //List<Point> island = new List<Point>();
                     //DepthFirstSearch(image, x, y, visited, island);
 
-                    // BFS Solution
+                    // BFS Solution (Memory limited - barely an issue)
                     List<Point> island = BFS(image, x, y, visited);
                     
                     islands.Add(island);
@@ -118,7 +118,7 @@ public class Challenge
                 int newY = current.Y + yPositions[i];
 
                 if (newX >= 0 && newX < image.Width && newY >= 0 && newY < image.Height &&
-                    image.GetPixel(newX, newY).Name != black &&
+                    image.GetPixel(newX, newY).Name == black &&
                     !visited[newX, newY])
                 {
                     visited[newX, newY] = true;
@@ -221,7 +221,7 @@ public class Challenge
     static void Main(string[] args)
     {
         // Testing object
-        Challenge test = new Challenge("../../../Images/drawisland(6).png");
+        Challenge test = new Challenge("../../../Images/drawisland(1).png");
         //Console.WriteLine(test.CountBlack());
 
         List<List<Point>> islands = test.FindIslandCenters();
