@@ -61,8 +61,13 @@ public class Challenge
                 // Pixel that is black and not ivisted yet
                 if (image.GetPixel(x, y).Name == black && !visited[x, y])
                 {
-                    List<Point> island = new List<Point>();
-                    DepthFirstSearch(image, x, y, visited, island);
+                    // DFS Solution
+                    //List<Point> island = new List<Point>();
+                    //DepthFirstSearch(image, x, y, visited, island);
+
+                    // BFS Solution
+                    List<Point> island = BFS(image, x, y, visited);
+                    
                     islands.Add(island);
                 }
             }
@@ -89,6 +94,40 @@ public class Challenge
         DepthFirstSearch(image, x - 1, y, visited, island);
         DepthFirstSearch(image, x, y + 1, visited, island);
         DepthFirstSearch(image, x, y - 1, visited, island);
+    }
+
+    private List<Point> BFS(Bitmap image, int startX, int startY, bool[,] visited)
+    {
+        List<Point> island = new List<Point>();
+        Queue<Point> queue = new Queue<Point>();
+        int[] xPositions = { 1, -1, 0, 0 };
+        int[] yPositions = { 0, 0, 1, -1 };
+
+        // Queue starting point
+        visited[startX, startY] = true;
+        queue.Enqueue(new Point(startX, startY));
+
+        while (queue.Count > 0)
+        {
+            Point current = queue.Dequeue();
+            island.Add(current);
+
+            for (int i = 0; i < 4; i++)
+            {
+                int newX = current.X + xPositions[i];
+                int newY = current.Y + yPositions[i];
+
+                if (newX >= 0 && newX < image.Width && newY >= 0 && newY < image.Height &&
+                    image.GetPixel(newX, newY).Name != black &&
+                    !visited[newX, newY])
+                {
+                    visited[newX, newY] = true;
+                    queue.Enqueue(new Point(newX, newY));
+                }
+            }
+        }
+
+        return island;
     }
 
     public Point FindCenter(List<Point> points)
