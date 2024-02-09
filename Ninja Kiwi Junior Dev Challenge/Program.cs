@@ -221,43 +221,50 @@ public class Challenge
     static void Main(string[] args)
     {
         // Testing object
-        Challenge test = new Challenge("../../../Images/drawisland(1).png");
+        Challenge test = new Challenge("../../../Images/ManyIslands.png");
         //Console.WriteLine(test.CountBlack());
 
         List<List<Point>> islands = test.FindIslandCenters();
-        
+
         Console.WriteLine("Number of islands: " + islands.Count);
 
-        // All island centers
-        for (int i = 0; i < islands.Count; i++)
+        if (islands.Count > 0)
         {
-            Point center = test.FindCenter(islands[i]);
-            Console.WriteLine($"Centermost point of Island {i + 1}: ({center.X}, {center.Y})");
-        }
+            // All island centers
+            for (int i = 0; i < islands.Count; i++)
+            {
+                Point center = test.FindCenter(islands[i]);
+                Console.WriteLine($"Centermost point of Island {i + 1}: ({center.X}, {center.Y})");
+            }
 
-        // Find Center island's center point
-        Point centralIsland = test.FindCenter(test.FindMostCentralIsland(islands));
-        Console.WriteLine($"Centermost Island: ({centralIsland.X}, {centralIsland.Y})");
-        
-        // Print smaller towers, skipping over the main tower
-        for (int i = 0; i < islands.Count; i++)
+            // Find Center island's center point
+            Point centralIsland = test.FindCenter(test.FindMostCentralIsland(islands));
+            Console.WriteLine($"Centermost Island: ({centralIsland.X}, {centralIsland.Y})");
+
+            // Print smaller towers, skipping over the main tower
+            for (int i = 0; i < islands.Count; i++)
+            {
+                Point center = test.FindCenter(islands[i]);
+                if (!(center.X == centralIsland.X && center.Y == centralIsland.Y))
+                    Console.WriteLine($"Smaller Communication towers point of Island {i + 1}: ({center.X}, {center.Y})");
+            }
+
+            Console.WriteLine($"Main Communication Tower: ({centralIsland.X}, {centralIsland.Y})");
+
+            // Save image with marked towers
+            test.MarkIslands(test.FindIslandCenters(), centralIsland);
+            test.SaveImage("../../../Images/Marked Islands.png");
+
+            Console.WriteLine("Saving Image with Communication Towers marked as \"Marked Islands\"");
+            Console.WriteLine("Small Communication Towers marked in YELLOW");
+            Console.WriteLine("Main Communication Tower marked in RED");
+
+            Console.WriteLine("End");
+        }
+        else
         {
-            Point center = test.FindCenter(islands[i]);
-            if (!(center.X == centralIsland.X && center.Y == centralIsland.Y))
-                Console.WriteLine($"Smaller Communication towers point of Island {i + 1}: ({center.X}, {center.Y})");
+            Console.WriteLine("No islands in image. Challenge not possible.");
         }
-
-        Console.WriteLine($"Main Communication Tower: ({centralIsland.X}, {centralIsland.Y})");
-
-        // Save image with marked towers
-        test.MarkIslands(test.FindIslandCenters(), centralIsland);
-        test.SaveImage("../../../Images/Marked Islands.png");
-
-        Console.WriteLine("Saving Image with Communication Towers marked as \"Marked Islands\"");
-        Console.WriteLine("Small Communication Towers marked in YELLOW");
-        Console.WriteLine("Main Communication Tower marked in RED");
-
-        Console.WriteLine("End");
     }
 }
 
