@@ -220,8 +220,16 @@ public class Challenge
 
     static void Main(string[] args)
     {
+        Console.WriteLine("Please select which image you would like to process:");
+        string[] imageList = Directory.GetFiles("../../../Images");
+        for (int i = 1; i < imageList.Length; i++)
+        {
+            Console.WriteLine($"{i}. {imageList[i].Replace("../../../Images\\", "")}");
+        }
+
+        Console.WriteLine($"");
         // Testing object
-        Challenge test = new Challenge("../../../Images/ManyIslands.png");
+        Challenge test = new Challenge("../../../Images/islands.png");
         //Console.WriteLine(test.CountBlack());
 
         List<List<Point>> islands = test.FindIslandCenters();
@@ -253,7 +261,8 @@ public class Challenge
 
             // Save image with marked towers
             test.MarkIslands(test.FindIslandCenters(), centralIsland);
-            test.SaveImage("../../../Images/Marked Islands.png");
+            // CHANGE NAME OF IMAGE TO SELECT YOUR IMAGE
+            test.SaveImage("../../../Images/islands.png");
 
             Console.WriteLine("Saving Image with Communication Towers marked as \"Marked Islands\"");
             Console.WriteLine("Small Communication Towers marked in YELLOW");
